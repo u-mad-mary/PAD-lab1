@@ -4,7 +4,7 @@
 
 The development of a distributed web chat system using microservices is relevant and necessary for several reasons:
 -   **Scalability**: As the user base grows, a monolithic architecture becomes cumbersome to maintain and scale. Microservices allow for scaling individual components independently, ensuring better performance under varying workloads.
-   -   **Flexibility**: Microservices enable the development team to choose the most suitable technology stack for each service, promoting flexibility in development and optimization.
+-   **Flexibility**: Microservices enable the development team to choose the most suitable technology stack for each service, promoting flexibility in development and optimization.
 -   **Reliability**: Isolating chat components into microservices enhances system reliability. Failures in one service do not necessarily affect the entire system, providing fault tolerance.
 -   **Ease of Maintenance**: Microservices allow for easier maintenance and updates. Changes to one microservice do not necessitate modifying the entire system.
 
@@ -21,7 +21,7 @@ The development of a distributed web chat system using microservices is relevant
 
 ## 3. Choose Technology Stack and Communication Patterns
 
--   **API Gateway**: Node.js for API server, Express.js for routing. Use REST for communication.
+-   **API Gateway**: Node.js for API server, Express.js for routing.
 -   **Chat Services**: Node.js for chat logic, Socket.io for real-time communication.
 -   **User Service**: Python with Flask for user authentication.
 -   **Communication Patterns**: REST for external communication, RPC for internal communication.
@@ -34,12 +34,11 @@ The development of a distributed web chat system using microservices is relevant
 1.  **Chat Services Database (MongoDB)**:
     -   Store chat-related data, including:
         -   Chat messages: Message content, timestamp, sender information.
-        -   Chat metadata: Chat participants, chat creation time, chat ID.
+        -   Chat metadata: Chat participants, chat Id etc.
     -   MongoDB, being a NoSQL database, is suitable for managing unstructured or semi-structured chat data.
+      
 2.  **User Service Database (PostgreSQL)**:
-    -   Store user-related data, including:
-        -   User credentials: Username, hashed password, email.
-        -   User profile: Name, status.
+    -   Store user-related data, including: Username, hashed password, email.
     -   PostgreSQL, a relational database, is suitable for structured data like user profiles and credentials.
     
 3.  **Data Caching (Redis)**:
