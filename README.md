@@ -268,7 +268,6 @@ In this way, User Service and Chat Services work together to manage user authent
       "message": "Another message.",
       "timestamp": "message_timestamp"
     }
-    // More message objects as needed
   ]
 }
 ```
