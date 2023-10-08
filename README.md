@@ -13,7 +13,7 @@ The development of a distributed web chat system using microservices is relevant
 ## 2. Define Service Boundaries:
 
 ### Services and Responsibilities:
--   **API Gateway**: Responsible for defining the API for the platform, forwarding requests to specific microservices, validating requests, and ensuring access control.
+-   **API Gateway**: Responsible for defining the API for the platform, forwarding requests to specific microservices, validating requests, ensuring access control and keeping the latest information in the cache.
 -   **Chat Service**: Manages different chats and their functionalities.
 -   **User Service**: Handles user managing and related operations.
 
