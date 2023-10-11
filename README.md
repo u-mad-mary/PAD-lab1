@@ -254,7 +254,7 @@ In this way, User Service and Chat Services work together to manage user authent
 
 ```json
 
-`{
+{
   "messages": [
     {
       "id": "unique_message_id",
@@ -293,3 +293,22 @@ In this way, User Service and Chat Services work together to manage user authent
 -   **Containerization**: Utilize Docker to containerize each microservice, enabling consistent deployment across different environments.
 -   **Orchestration**: Use Kubernetes for managing, scaling, and orchestrating the deployment of microservices, ensuring resilience and fault tolerance.
 
+
+### 6. Current state of the project
+
+At the moment the project has a basic implementation, where the api gateway communicates with the 2 services.
+
+To run the app, build the docker-compose file using the following command:
+```text
+docker-compose up --build
+```
+
+To create a chat you need to make a post request to the gateway:
+```text
+curl -X POST -H "Content-Type: application/json" -d '{"name": "Chat Group", "participants": ["user_id1", "user_id2"]}' http://localhost:3000/api/chat
+```
+
+To create a user you also need to send a post request to the gateway:
+```text
+curl -X POST -H "Content-Type: application/json" -d '{"username": "john_doe", "email": "john@example.com"}' http://localhost:3000/api/user     
+```
