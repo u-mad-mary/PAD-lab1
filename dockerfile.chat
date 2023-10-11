@@ -1,0 +1,8 @@
+FROM python:3.8
+
+WORKDIR /app
+
+COPY chat_service.py /app/chat_service.py
+RUN pip install flask
+
+CMD ["python", "chat_service.py"]

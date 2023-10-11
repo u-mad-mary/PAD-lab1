@@ -22,7 +22,7 @@ The development of a distributed web chat system using microservices is relevant
 ## 3. Choose Technology Stack and Communication Patterns
 
 -   **API Gateway**: Node.js for API server, Express.js for routing.
--   **Chat Services**: Node.js for chat logic, Socket.io for real-time communication.
+-   **Chat Services**: Python for chat logic, Socket.io for real-time communication.
 -   **User Service**: Python with Flask for user authentication.
 -   **Communication Patterns**: REST for external communication, RPC for internal communication.
 

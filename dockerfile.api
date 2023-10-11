@@ -1,0 +1,8 @@
+FROM node:14
+
+WORKDIR /app
+
+COPY api_gateway.js /app/api_gateway.js
+RUN npm install express axios
+
+CMD ["node", "api_gateway.js"]
