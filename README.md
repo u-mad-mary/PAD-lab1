@@ -310,5 +310,5 @@ curl -X POST -H "Content-Type: application/json" -d '{"name": "Chat Group", "par
 
 To create a user you also need to send a post request to the gateway:
 ```text
-curl -X POST -H "Content-Type: application/json" -d '{"username": "john_doe", "email": "john@example.com"}' http://localhost:3000/api/user     
+curl -X POST -H "Content-Type: application/json" -d '{"username": "john_doe", "email": "john@example.com"}' http://localhost:3000/api/user
 ```
