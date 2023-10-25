@@ -5,7 +5,7 @@ services:
     build:
         context: .
         dockerfile: dockerfile.chat
-    image: chat-service:latest  
+    image: umadmary/pad-1:chat-service 
     container_name: chat-service
     ports:
       - "5001:5001"
@@ -16,7 +16,7 @@ services:
     build:
         context: .
         dockerfile: dockerfile.user
-    image: user-service:latest  
+    image: umadmary/pad-1:user-service
     container_name: user-service
     ports:
       - "5002:5002"
@@ -27,7 +27,7 @@ services:
     build:
         context: .
         dockerfile: dockerfile.api
-    image: api-gateway:latest
+    image: umadmary/pad-1:api-gateway
     container_name: api-gateway
     ports:
       - "3000:3000"
