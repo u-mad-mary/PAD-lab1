@@ -3,6 +3,8 @@ FROM python:3.8
 WORKDIR /app
 
 COPY chat_service.py /app/chat_service.py
-RUN pip install flask
+COPY chats.db /app/chats.db
+
+RUN pip install flask flask_sqlalchemy sqlalchemy
 
 CMD ["python", "chat_service.py"]

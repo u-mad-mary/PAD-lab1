@@ -22,50 +22,30 @@ The development of a distributed web chat system using microservices is relevant
 ## 3. Choose Technology Stack and Communication Patterns
 
 -   **API Gateway**: Node.js for API server, Express.js for routing.
--   **Chat Services**: Python for chat logic, Socket.io for real-time communication.
+-   **Chat Services**: Python for chat logic
 -   **User Service**: Python with Flask for user authentication.
--   **Communication Patterns**: REST for external communication, RPC for internal communication.
+-   **Communication Patterns**: REST
 
 ## 4. Design Data Management:
 
 -   Each microservice will have its dedicated database for optimal data management.
--   Use caching (e.g., Redis) for frequently accessed data to improve performance.
-
-1.  **Chat Services Database (MongoDB)**:
-    -   Store chat-related data, including:
-        -   Chat messages: Message content, timestamp, sender information.
-        -   Chat metadata: Chat participants, chat Id etc.
-    -   MongoDB, being a NoSQL database, is suitable for managing unstructured or semi-structured chat data.
-      
-2.  **User Service Database (PostgreSQL)**:
-    -   Store user-related data, including: Username, hashed password, email.
-    -   PostgreSQL, a relational database, is suitable for structured data like user profiles and credentials.
-    
-3.  **Data Caching (Redis)**:
-    -   Utilize Redis for caching frequently accessed data, improving system performance by reducing the load on the databases.
-    -   Cache the following types of data:
-        -   Recent chat messages.
-        -   User authentication tokens to speed up the login process.
+-   Use caching for frequently accessed data to improve performance.
 
 ### Communication between the components:
 
 1.  **User Sign-up and Authentication**:
-    
     -   When a user signs up or logs in, the User Service handles user authentication and generates an authentication token.
     -   The User Service also manages user profiles, including user IDs.
 2.  **Creating a Chat**:
-    
     -   When a user creates a new chat group, they specify the chat name and invite other users (participants) to the chat.
     -   The API Gateway receives the chat creation request and forwards it to the appropriate Chat Service.
 3.  **Communication between User Service and Chat Services**:
-    
     -   The User Service maintains a record of users' chat memberships. This record includes the user ID and the list of chat IDs they are part of.
     -   Chat Services are responsible for handling chat-related functionality.
     -   When a user is added to a chat or removed from a chat, the API Gateway sends a request to the User Service for user verification and permission.
     -   The User Service verifies the user's authentication token to ensure the user has the necessary permissions to be added or removed from the chat.
     -   Once verified, the User Service informs the appropriate Chat Service about the user's addition or removal from the chat.
 4.  **Chat Services Manage Chat Participants**:
-    
     -   Chat Services keep track of chat participants in their local databases.
     -   When a user is added to a chat, the Chat Service responsible for that chat updates its participant list.
     -   Similarly, when a user is removed from a chat, the Chat Service updates its participant list accordingly.
@@ -296,7 +276,7 @@ In this way, User Service and Chat Services work together to manage user authent
 
 ### 6. Current state of the project
 
-At the moment the project has a basic implementation, where the api gateway communicates with the 2 services.
+At the moment the project has a basic implementation, where the api gateway communicates with the 2 services, the databases for each service and cache for gateway are also implemented.
 
 To run the app, build the docker-compose file using the following command:
 ```text
@@ -311,4 +291,23 @@ curl -X POST -H "Content-Type: application/json" -d '{"name": "Chat Group", "par
 To create a user you also need to send a post request to the gateway:
 ```text
 curl -X POST -H "Content-Type: application/json" -d '{"username": "john_doe", "email": "john@example.com"}' http://localhost:3000/api/user
+```
+To remove a chat/user send a delete request to the gateway:
+```text
+curl -X DELETE http://localhost:3000/api/user/{id}
+
+curl -X DELETE http://localhost:3000/api/chat/{id}
+```
+
+To make changes to the services' data send a put request to the gateway:
+```text
+curl -X PUT http://localhost:3000/api/user/{userId} -H "Content-Type: application/json" -d '{"username": "UpdatedUsername", "email": "updated@example.com"}'
+
+curl -X PUT http://localhost:3000/api/chat/{chatId} -H "Content-Type: application/json" -d '{"name": "Updated Chat Name", "participants": ["User1", "User2"]}'
+
+```
+
+To view the cached data make a get request as following:
+```text
+curl -X GET http://localhost:3000/api/cache
 ```

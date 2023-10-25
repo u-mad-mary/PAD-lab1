@@ -3,6 +3,6 @@ FROM node:14
 WORKDIR /app
 
 COPY api_gateway.js /app/api_gateway.js
-RUN npm install express axios express-rate-limit
+RUN npm install express axios express-rate-limit node-cache
 
 CMD ["node", "api_gateway.js"]

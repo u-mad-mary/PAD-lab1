@@ -3,6 +3,8 @@ FROM python:3.8
 WORKDIR /app
 
 COPY user_service.py /app/user_service.py
-RUN pip install flask
+COPY users.db /app/users.db
+
+RUN pip install flask flask_sqlalchemy sqlalchemy
 
 CMD ["python", "user_service.py"]
