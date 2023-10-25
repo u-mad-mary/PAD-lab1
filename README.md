@@ -280,6 +280,7 @@ to be updated...
 
 At the moment the project has a basic implementation, where the api gateway communicates with the 2 services, the databases for each service and cache for gateway are also implemented.
 
+***the image doesn't work properly yet***
 To be able to run the project firstly pull the docker images by entering in the terminal:
 ```text
 docker pull umadmary/pad-1
