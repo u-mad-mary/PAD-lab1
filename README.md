@@ -254,6 +254,8 @@ In this way, User Service and Chat Services work together to manage user authent
 
 ### Data Storage
 
+to be updated...
+
 - **MongoDB Collections**:
   - **Chats Collection**:
     - Fields: `chatId` (string), `name` (string), `participants` (array), `messages` (array of message objects)
@@ -278,7 +280,16 @@ In this way, User Service and Chat Services work together to manage user authent
 
 At the moment the project has a basic implementation, where the api gateway communicates with the 2 services, the databases for each service and cache for gateway are also implemented.
 
-To run the app, build the docker-compose file using the following command:
+To be able to run the project firstly pull the docker images by entering in the terminal:
+```text
+docker pull umadmary/pad-1
+```
+
+Or access Docker Desktop and search for 'umadmary/pad-1' in the Hub Images.
+
+Then run the image.
+
+To run the app using the files from github, build the docker-compose file using the following command:
 ```text
 docker-compose up --build
 ```
