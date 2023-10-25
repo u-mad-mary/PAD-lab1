@@ -280,15 +280,18 @@ to be updated...
 
 At the moment the project has a basic implementation, where the api gateway communicates with the 2 services, the databases for each service and cache for gateway are also implemented.
 
-***the image doesn't work properly yet***
 To be able to run the project firstly pull the docker images by entering in the terminal:
 ```text
-docker pull umadmary/pad-1
+docker pull umadmary/pad-1:api-gateway
+docker pull umadmary/pad-1:user-service
+docker pull umadmary/pad-1:chat-service
 ```
 
-Or access Docker Desktop and search for 'umadmary/pad-1' in the Hub Images.
-
-Then run the image.
+Download the docker-compose.yml file together wit .db files and put them in the directory you are currently in.
+Then use:
+```text
+docker compose up
+```
 
 To run the app using the files from github, build the docker-compose file using the following command:
 ```text
