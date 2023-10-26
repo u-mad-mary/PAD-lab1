@@ -17,7 +17,6 @@ const axiosInstance = axios.create({
 
 const cache = new NodeCache({ stdTTL: 30 }); // Set a 30-second cache expiration
 
-
 const limiter = rateLimit({
   windowMs: 60 * 1000,
   max: 10,
@@ -51,12 +50,33 @@ app.get('/api/chat', limiter, async (req, res) => {
   }
 });
 
+// Route to get a specific chat by ID
+app.get('/api/chat/:id', limiter, async (req, res) => {
+  const chatId = req.params.id;
+  const cacheKey = `chatData_${chatId}`;
+  try {
+    const cachedData = cache.get(cacheKey);
+    if (cachedData) {
+      // Output the cached data along with a timestamp or identifier
+      const timestamp = new Date().toISOString();
+      return res.json({ cachedData, timestamp });
+    }
+
+    const response = await axiosInstance.get(`${chatServiceURL}/chat/${chatId}`);
+    const responseData = response.data;
+    // Store the data in the cache along with a timestamp or identifier
+    cache.set(cacheKey, { data: responseData, timestamp: new Date().toISOString() });
+    res.json({ data: responseData, timestamp: new Date().toISOString() });
+  } catch (error) {
+    handleErrorResponse(error, res);
+  }
+});
+
 app.post('/api/chat', limiter, async (req, res) => {
   try {
     const response = await axiosInstance.post(`${chatServiceURL}/chat`, req.body, {
       headers: { 'Content-Type': 'application/json' },
     });
-    // Clear the cache on new data
     cache.del('chatData');
     res.json(response.data);
   } catch (error) {
@@ -70,7 +90,6 @@ app.put('/api/chat/:id', limiter, async (req, res) => {
     const response = await axiosInstance.put(`${chatServiceURL}/chat/${chatId}`, req.body, {
       headers: { 'Content-Type': 'application/json' },
     });
-    // Clear the cache on update
     cache.del('chatData');
     res.json(response.data);
   } catch (error) {
@@ -82,13 +101,26 @@ app.delete('/api/chat/:id', limiter, async (req, res) => {
   const chatId = req.params.id;
   try {
     const response = await axiosInstance.delete(`${chatServiceURL}/chat/${chatId}`);
-    // Clear the cache on deletion
     cache.del('chatData');
     res.json(response.data);
   } catch (error) {
     handleErrorResponse(error, res);
   }
 });
+
+// Route to create a message in a chat
+app.post('/api/chat/:id/message', limiter, async (req, res) => {
+  const chatId = req.params.id;
+  try {
+    const response = await axiosInstance.post(`${chatServiceURL}/chat/${chatId}/message`, req.body, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    res.json(response.data);
+  } catch (error) {
+    handleErrorResponse(error, res);
+  }
+});
+
 
 // Routes for User Service
 app.get('/api/user', limiter, async (req, res) => {
@@ -102,6 +134,28 @@ app.get('/api/user', limiter, async (req, res) => {
     const responseData = response.data;
     cache.set('userData', responseData);
     res.json(responseData);
+  } catch (error) {
+    handleErrorResponse(error, res);
+  }
+});
+
+// Route to get a specific user by ID
+app.get('/api/user/:id', limiter, async (req, res) => {
+  const userId = req.params.id;
+  const cacheKey = `userData_${userId}`;
+  try {
+    const cachedData = cache.get(cacheKey);
+    if (cachedData) {
+      // Output the cached data along with a timestamp or identifier
+      const timestamp = new Date().toISOString();
+      return res.json({ cachedData, timestamp });
+    }
+
+    const response = await axiosInstance.get(`${userServiceURL}/user/${userId}`);
+    const responseData = response.data;
+    // Store the data in the cache along with a timestamp or identifier
+    cache.set(cacheKey, { data: responseData, timestamp: new Date().toISOString() });
+    res.json({ data: responseData, timestamp: new Date().toISOString() });
   } catch (error) {
     handleErrorResponse(error, res);
   }

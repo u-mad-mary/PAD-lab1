@@ -34,4 +34,3 @@ services:
     depends_on:
       - chat-service
       - user-service
-
