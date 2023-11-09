@@ -16,7 +16,8 @@ The development of a distributed web chat system using microservices is relevant
 -   **API Gateway**: Responsible for defining the API for the platform, forwarding requests to specific microservices, validating requests, ensuring access control and keeping the latest information in the cache.
 -   **Chat Service**: Manages different chats and their functionalities.
 -   **User Service**: Handles user managing and related operations.
-
+-   **Load Balancer**: Handles the network flow and increases/decreases the number of services to accomdate the flow
+.
 ![Architecture](chat_sys.png)
 
 ## 3. Choose Technology Stack and Communication Patterns
@@ -65,13 +66,12 @@ In this way, User Service and Chat Services work together to manage user authent
 
 #### 1. User Sign-up
 
-- **Endpoint**: `/api/user/signup`
+- **Endpoint**: `/api/user`
 - **Method**: `POST`
 - **Request Body**:
 ```json
 {
   "username": "example_user",
-  "password": "password123",
   "email": "example@example.com"
 }
 ```
@@ -89,7 +89,7 @@ In this way, User Service and Chat Services work together to manage user authent
 
 #### 2. User Log-in
 
-- **Endpoint**: `/api/user/login`
+- **Endpoint**: `/api/user
 - **Method**: `POST`
 - **Request Body**:
 ```json
@@ -106,7 +106,6 @@ In this way, User Service and Chat Services work together to manage user authent
     "id": "unique_user_id",
     "username": "example_user",
     "email": "example@example.com",
-    "token": "auth_token"
   }
 }
 ```
@@ -115,7 +114,7 @@ In this way, User Service and Chat Services work together to manage user authent
 
 #### 3. Create a Chat
 
-- **Endpoint**: `/api/chat/create`
+- **Endpoint**: `/api/chat`
 - **Method**: `POST`
 - **Request Body**:
 ```json
@@ -138,7 +137,7 @@ In this way, User Service and Chat Services work together to manage user authent
 
 #### 4. Edit Chat Details
 
-- **Endpoint**: `/api/chat/edit/:chatId`
+- **Endpoint**: `/api/chat/:chatId`
 - **Method**: `PATCH`
 - **Request Body**:
 ```json
@@ -155,7 +154,7 @@ In this way, User Service and Chat Services work together to manage user authent
 
 #### 5. Delete a Chat
 
-- **Endpoint**: `/api/chat/delete/:chatId`
+- **Endpoint**: `/api/chat/:chatId`
 - **Method**: `DELETE`
 - **Response**:
 ```json
@@ -164,51 +163,15 @@ In this way, User Service and Chat Services work together to manage user authent
 }
 ```
 
-#### 6. Add User to a Chat
-
-- **Endpoint**: `/api/chat/add-user/:chatId`
-- **Method**: `POST`
-- **Request Body**:
-```json
-{
-  "userId": "user_id_to_add"
-}
-```
-- **Response**:
-```json
-{
-  "message": "User added to the chat"
-}
-```
-
-#### 7. Remove User from a Chat
-
-- **Endpoint**: `/api/chat/remove-user/:chatId`
-- **Method**: `DELETE`
-- **Request Body**:
-```json
-{
-  "userId": "user_id_to_remove"
-}
-```
-- **Response**:
-```json
-{
-  "message": "User removed from the chat"
-}
-```
-
 ### Messaging
 
-#### 8. Write a Message to a Chat
+#### 6. Write a Message to a Chat
 
-- **Endpoint**: `/api/chat/message/:chatId`
+- **Endpoint**: `/api/chat/:chatId/message`
 - **Method**: `POST`
 - **Request Body**:
 ```json
 {
-  "userId": "user_id",  
-  "messageId": "unique_message_id",
   "message": "Hello, this is a message."
 }
 ```
@@ -217,68 +180,18 @@ In this way, User Service and Chat Services work together to manage user authent
 {
   "message": "Message sent successfully",
   "messageInfo": {
-    "id": "unique_message_id",
-    "userId": "user_id",
     "messageId": "unique_message_id",
-    "message": "Hello, this is a message.",
-    "timestamp": "message_timestamp"
+    "message": "Hello, this is a message."
   }
-}
-```
-
-#### 9. Get All Messages in a Chat
-
--   **Endpoint**: `/api/chat/messages/:chatId`
--   **Method**: `GET`
--   **Response**:
-
-```json
-
-{
-  "messages": [
-    {
-      "id": "unique_message_id",
-      "userId": "user_id",
-      "message": "Hello, this is a message.",
-      "timestamp": "message_timestamp"
-    },
-    {
-      "id": "unique_message_id",
-      "userId": "user_id",
-      "message": "Another message.",
-      "timestamp": "message_timestamp"
-    }
-  ]
 }
 ```
 
 ### Data Storage
 
-to be updated...
-
-- **MongoDB Collections**:
-  - **Chats Collection**:
-    - Fields: `chatId` (string), `name` (string), `participants` (array), `messages` (array of message objects)
-  - **Messages Collection**:
-    - Fields: `messageId` (string), `chatId` (string), `userId (sender)` (string), `message` (string), `timestamp` (datetime)
-
-- **PostgreSQL Tables**:
-  - **Users Table**:
-    - Fields: `userId` (string), `username` (string), `password` (string), `email` (string)
-    
-### Caching
-- **Redis Keys**:
-  - `recent_messages:{chatId}`: Caching recent chat messages for a specific chat.
-  - `user_token:{userId}`: Caching user authentication tokens.
-
-### 5. Deployment and Scaling:
--   **Containerization**: Utilize Docker to containerize each microservice, enabling consistent deployment across different environments.
--   **Orchestration**: Use Kubernetes for managing, scaling, and orchestrating the deployment of microservices, ensuring resilience and fault tolerance.
+For data storage will be used PostgreSQL.
 
 
-### 6. Current state of the project
-
-At the moment the project has a basic implementation, where the api gateway communicates with the 2 services, the databases for each service and cache for gateway are also implemented.
+### 6. Run the project
 
 To be able to run the project firstly pull the docker images by entering in the terminal:
 ```text
@@ -288,6 +201,7 @@ docker pull umadmary/pad-1:chat-service
 ```
 
 Download the docker-compose.yml file together wit .db files and put them in the directory you are currently in.
+
 Then use:
 ```text
 docker compose up
@@ -297,32 +211,14 @@ To run the app using the files from github, build the docker-compose file using 
 ```text
 docker-compose up --build
 ```
+To make the requests please consult the posman collection from this repository.
 
-To create a chat you need to make a post request to the gateway:
-```text
-curl -X POST -H "Content-Type: application/json" -d '{"name": "Chat Group", "participants": ["user_id1", "user_id2"]}' http://localhost:3000/api/chat
-```
+### 7. Future plans
 
-To create a user you also need to send a post request to the gateway:
-```text
-curl -X POST -H "Content-Type: application/json" -d '{"username": "john_doe", "email": "john@example.com"}' http://localhost:3000/api/user
-```
-To remove a chat/user send a delete request to the gateway:
-```text
-curl -X DELETE http://localhost:3000/api/user/{id}
-
-curl -X DELETE http://localhost:3000/api/chat/{id}
-```
-
-To make changes to the services' data send a put request to the gateway:
-```text
-curl -X PUT http://localhost:3000/api/user/{userId} -H "Content-Type: application/json" -d '{"username": "UpdatedUsername", "email": "updated@example.com"}'
-
-curl -X PUT http://localhost:3000/api/chat/{chatId} -H "Content-Type: application/json" -d '{"name": "Updated Chat Name", "participants": ["User1", "User2"]}'
-
-```
-
-To view the cached data make a get request as following:
-```text
-curl -X GET http://localhost:3000/api/cache
-```
+In the plan is to implement the following:
+1. Circuit Breaker
+2. Service High Availability
+3. ELK stack or Prometeus + Grafana for logging
+4. 2 Phase Commits
+5. Consistent Hashing for Cache
+6. Cache High Availability

@@ -18,8 +18,8 @@ const axiosInstance = axios.create({
 const cache = new NodeCache({ stdTTL: 30 }); // Set a 30-second cache expiration
 
 const limiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 10,
+  windowMs: 60 * 1000,  // 1 minute
+  max: 10, // limit each IP to 10 requests per windowMs
 });
 
 // Error handling function
@@ -57,14 +57,14 @@ app.get('/api/chat/:id', limiter, async (req, res) => {
   try {
     const cachedData = cache.get(cacheKey);
     if (cachedData) {
-      // Output the cached data along with a timestamp or identifier
+      // Output the cached data along with a timestamp  identifier
       const timestamp = new Date().toISOString();
       return res.json({ cachedData, timestamp });
     }
 
     const response = await axiosInstance.get(`${chatServiceURL}/chat/${chatId}`);
     const responseData = response.data;
-    // Store the data in the cache along with a timestamp or identifier
+    // Store the data in the cache along with a timestamp identifier
     cache.set(cacheKey, { data: responseData, timestamp: new Date().toISOString() });
     res.json({ data: responseData, timestamp: new Date().toISOString() });
   } catch (error) {
