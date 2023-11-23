@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY . /app
 
-RUN pip install flask flask_sqlalchemy sqlalchemy requests
+RUN pip install flask flask_sqlalchemy sqlalchemy requests psycopg2
 
 CMD ["python", "chat_service.py"]

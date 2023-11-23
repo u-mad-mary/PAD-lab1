@@ -6,7 +6,8 @@ import requests
 
 app = Flask(__name__)
 
-database_uri = 'sqlite:///chats.db'
+database_uri = 'postgresql://mada:password@chat-db:5432/chats_db'
+
 user_service_url = 'http://user-service:5002/user'
 engine = create_engine(database_uri)
 engine.connect()

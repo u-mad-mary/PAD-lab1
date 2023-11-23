@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY . /app
 
-RUN pip install flask flask_sqlalchemy sqlalchemy
+RUN pip install flask flask_sqlalchemy sqlalchemy psycopg2
 
 CMD ["python", "user_service.py"]

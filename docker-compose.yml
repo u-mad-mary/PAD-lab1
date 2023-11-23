@@ -1,36 +1,60 @@
-version: '3'
+version: '3.8'  
 
 services:
+
+  user-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: mada
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
+
+  chat-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: mada
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: chats_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - chat-db-data:/var/lib/postgresql/data
+
   chat-service:
     build:
-        context: .
-        dockerfile: dockerfile.chat
+      context: .
+      dockerfile: dockerfile.chat
     image: umadmary/pad-1:chat-service 
-    container_name: chat-service
     ports:
-      - "5001:5001"
-    volumes:
-      - ./chats.db:/app/chats.db
+      - "5001"
+    deploy:
+      replicas: 2  
 
   user-service:
     build:
-        context: .
-        dockerfile: dockerfile.user
+      context: .
+      dockerfile: dockerfile.user
     image: umadmary/pad-1:user-service
-    container_name: user-service
     ports:
-      - "5002:5002"
-    volumes:
-      - ./users.db:/app/users.db
+      - "5002"
+    deploy:
+      replicas: 2 
 
   api-gateway:
     build:
-        context: .
-        dockerfile: dockerfile.api
+      context: .
+      dockerfile: dockerfile.api
     image: umadmary/pad-1:api-gateway
-    container_name: api-gateway
     ports:
       - "3000:3000"
     depends_on:
       - chat-service
       - user-service
+      
+volumes:
+  user-db-data:
+  chat-db-data:

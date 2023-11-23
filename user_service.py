@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 
 app = Flask(__name__)
 
-database_uri = 'sqlite:///users.db'
+database_uri = 'postgresql://mada:password@user-db:5432/users_db'
 engine = create_engine(database_uri)
 engine.connect()
 
