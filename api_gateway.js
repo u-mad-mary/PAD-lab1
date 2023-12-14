@@ -3,6 +3,8 @@ const axios = require('axios');
 const rateLimit = require('express-rate-limit');
 const NodeCache = require('node-cache');
 
+const client = require('prom-client');
+
 const app = express();
 const PORT = 3000;
 
@@ -28,16 +30,34 @@ const limiter = rateLimit({
 let userServiceCounter = 0;
 let chatServiceCounter = 0;
 const circuitBreakerStates = {
-    userService: { state: 'CLOSED', failureCount: 0, nextTry: 0 },
-    chatService: { state: 'CLOSED', failureCount: 0, nextTry: 0 }
+    userService: { state: 'CLOSED', failureCount: 0, nextTry: 0 },  // normal state
+    chatService: { state: 'CLOSED', failureCount: 0, nextTry: 0 }   // normal state
 };
 const FAILURE_THRESHOLD = 5;
 const TIMEOUT = 30000; // 30 seconds
 
+
+const collectDefaultMetrics = client.collectDefaultMetrics;
+collectDefaultMetrics({ timeout: 5000 });
+
+const httpRequestDurationMicroseconds = new client.Histogram({
+  name: 'http_request_duration_ms',
+  help: 'Duration of HTTP requests in ms',
+  labelNames: ['method', 'route', 'code'],
+  buckets: [0.1, 5, 15, 50, 100, 500]
+});
+
+
+app.use((req, res, next) => {
+  res.locals.startEpoch = Date.now();
+  next();
+});
+
+
 // Load Balancer function
 function loadBalancer(serviceInstances, serviceName) {
     // Check Circuit Breaker state
-    if (circuitBreakerStates[serviceName].state === 'OPEN') {
+    if (circuitBreakerStates[serviceName].state === 'OPEN') { // failures exceed FAILURE_THRESHOLD
         if (Date.now() > circuitBreakerStates[serviceName].nextTry) {
             circuitBreakerStates[serviceName].state = 'HALF-OPEN';
         } else {
@@ -52,17 +72,9 @@ function loadBalancer(serviceInstances, serviceName) {
     return instanceUrl;
 }
 
-
 // Forward request to the service and handle Circuit Breaker logic
 async function forwardRequest(serviceUrl, req, res, serviceName, cacheKey, requestBody) {
   try {
-    // Check cache first
-    const cachedData = cacheKey ? cache.get(cacheKey) : null;
-    if (cachedData) {
-      return res.json(cachedData);
-    }
-
-    // Make the request if data not in cache
     let response;
     if (req.method === 'GET') {
       response = await axiosInstance.get(serviceUrl);
@@ -74,26 +86,25 @@ async function forwardRequest(serviceUrl, req, res, serviceName, cacheKey, reque
       response = await axiosInstance.delete(serviceUrl);
     }
 
-    // Store in cache
-    if (cacheKey && response.data) {
+    // Cache logic, if applicable
+    if (cacheKey) {
       cache.set(cacheKey, response.data);
     }
 
     res.json(response.data);
     // Reset failure count if Circuit Breaker is HALF-OPEN
-    if (circuitBreakerStates[serviceName].state === 'HALF-OPEN') {
+    if (circuitBreakerStates[serviceName].state === 'HALF-OPEN') { // After TIMEOUT, the state changes to HALF-OPEN, allowing a few test requests to check if the issue is resolved.
       circuitBreakerStates[serviceName] = { state: 'CLOSED', failureCount: 0, nextTry: 0 };
     }
   } catch (error) {
     // Increase failure count
     circuitBreakerStates[serviceName].failureCount++;
     if (circuitBreakerStates[serviceName].failureCount > FAILURE_THRESHOLD) {
-      circuitBreakerStates[serviceName] = { state: 'OPEN', failureCount: 0, nextTry: Date.now() + TIMEOUT };
+      circuitBreakerStates[serviceName] = { state: 'OPEN', failureCount: 0, nextTry: Date.now() + TIMEOUT }; 
     }
     handleErrorResponse(error, res);
   }
 }
-
 
 // Error handling function
 function handleErrorResponse(error, res) {
@@ -224,6 +235,18 @@ app.get('/api/cache', (req, res) => {
   res.json(cachedData);
 });
 
+// After your routes
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', client.register.contentType);
+  res.end(await client.register.metrics());
+});
+
+// Update your existing routes to record the metrics
+app.use((req, res, next) => {
+  const responseTimeInMs = Date.now() - res.locals.startEpoch;
+  httpRequestDurationMicroseconds.labels(req.method, req.route.path, res.statusCode).observe(responseTimeInMs);
+  next();
+});
 
 app.listen(PORT, () => {
   console.log(`API Gateway running at http://localhost:${PORT}`);

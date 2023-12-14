@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY . /app
 
-RUN npm install express axios express-rate-limit node-cache
+RUN npm install express axios express-rate-limit node-cache prom-client
 
 CMD ["node", "api_gateway.js"]
