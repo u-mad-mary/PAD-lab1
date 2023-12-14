@@ -41,7 +41,7 @@ const collectDefaultMetrics = client.collectDefaultMetrics;
 collectDefaultMetrics({ timeout: 5000 });
 
 const httpRequestDurationMicroseconds = new client.Histogram({
-  name: 'http_request_duration_ms',
+  name: 'http_request_duration_seconds_sum',
   help: 'Duration of HTTP requests in ms',
   labelNames: ['method', 'route', 'code'],
   buckets: [0.1, 5, 15, 50, 100, 500]

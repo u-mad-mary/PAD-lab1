@@ -1,0 +1,15 @@
+# config file for provisioning datasources
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    type: prometheus
+    url: http://host.docker.internal:9090
+    access: proxy
+    jsonData:
+      httpMethod: POST
+      manageAlerts: true
+      prometheusType: Prometheus
+      prometheusVersion: 2.19.0
+      cacheLevel: 'High'
+      disableRecordingRules: false
+      incrementalQueryOverlapWindow: 10m
